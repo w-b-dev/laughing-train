@@ -1,24 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import EntryForm from "./EntryForm/";
+import Results from "./Results/";
+import "./App.css";
+import { API_RESPONSE, getImage } from "./API";
+import { initialState } from "./mock";
+import { AppState } from "./types";
 
 function App() {
+  const [state, setState] = useState<AppState>(initialState);
+  useEffect(() => {
+    setState((state) => ({ ...state, isLoading: true }));
+    getImage({})
+      .then((r: API_RESPONSE) => {
+        setState((state) => ({ ...state, isLoading: false, data: r }));
+      })
+      .catch((e) => console.error(e));
+  }, []);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <EntryForm />
+      <hr />
+      <Results loading={state.isLoading} url={state.data.url} />
     </div>
   );
 }
